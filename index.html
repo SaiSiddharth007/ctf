@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tachyon CTF // Payload Verification</title>
     <style>
-        /* CSS STYLING */
         body {
             margin: 0;
             padding: 0;
@@ -19,7 +18,6 @@
             background-image: radial-gradient(circle at center, #0a1122 0%, #05070a 100%);
             overflow: hidden;
         }
-
         .terminal-container {
             width: 100%;
             max-width: 600px;
@@ -29,7 +27,6 @@
             box-shadow: 0px 0px 20px rgba(0, 255, 204, 0.1);
             margin: 20px;
         }
-
         .terminal-header {
             background-color: #0d121f;
             padding: 10px 20px;
@@ -39,7 +36,6 @@
             font-size: 12px;
             color: #4b5563;
         }
-
         .dots span {
             display: inline-block;
             width: 10px;
@@ -50,11 +46,9 @@
         .dot-red { background-color: #ef4444; }
         .dot-yellow { background-color: #eab308; }
         .dot-green { background-color: #22c55e; }
-
         .terminal-body {
             padding: 40px 30px;
         }
-
         h1 {
             color: #f3f4f6;
             font-size: 22px;
@@ -62,18 +56,15 @@
             letter-spacing: 1px;
             margin-bottom: 20px;
         }
-
         p { line-height: 1.6; color: #9ca3af; }
         .highlight { color: #00ffcc; }
         .error { color: #ef4444; }
-
         .input-group {
             margin-top: 30px;
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
-
         input[type="text"] {
             background-color: #05070a;
             border: 1px solid #3b82f6;
@@ -86,12 +77,10 @@
             box-sizing: border-box;
             transition: border-color 0.3s;
         }
-
         input[type="text"]:focus {
             border-color: #00ffcc;
             box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
         }
-
         button {
             background-color: #1d4ed8;
             color: #ffffff;
@@ -104,17 +93,12 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
         }
-
         button:hover {
             background-color: #3b82f6;
             box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
         }
-
-        /* Hidden by default */
         #success-screen { display: none; }
         #loading { display: none; color: #eab308; margin-top: 15px; }
-
-        /* Typewriter effect class */
         .typewriter {
             overflow: hidden;
             border-right: .15em solid #00ffcc;
@@ -123,7 +107,6 @@
             letter-spacing: .15em;
             animation: blink-caret .75s step-end infinite;
         }
-
         @keyframes blink-caret {
             from, to { border-color: transparent }
             50% { border-color: #00ffcc; }
@@ -131,7 +114,6 @@
     </style>
 </head>
 <body>
-
     <div class="terminal-container">
         <div class="terminal-header">
             <div class="dots">
@@ -141,82 +123,86 @@
             </div>
             <div>tachyon@verification_server</div>
         </div>
-
         <div class="terminal-body" id="input-screen">
             <h1>> Awaiting Payload_</h1>
             <p>You've breached the outer layer. Enter the hidden flag you extracted from the source transmission below to verify your access.</p>
-            
             <div class="input-group">
                 <input type="text" id="flag-input" placeholder="FLAG{...}" autocomplete="off" spellcheck="false">
                 <button onclick="verifyFlag()">Execute Validation</button>
             </div>
-            
             <p id="loading">> Analyzing checksum...</p>
             <p id="error-msg" class="error"></p>
         </div>
-
         <div class="terminal-body" id="success-screen">
             <h1 style="color: #22c55e;">> ACCESS GRANTED</h1>
             <div id="typewriter-text" style="color: #9ca3af; line-height: 1.8;"></div>
         </div>
     </div>
-
     <script>
-        // The correct flag from your email template
-        const CORRECT_FLAG = "TACHYON{w31c0m3_b4by}";
-        
-        // The URL you want to send them to after they win (Your registration page)
-        const REGISTRATION_URL = "https://sa.iittp.ac.in/clubs/DigitalWizards";
+        const c = [126, 107, 105, 114, 115, 101, 100, 81, 93, 25, 27, 73, 26, 67, 25, 117, 72, 30, 72, 83, 87];
+        const r = "https://your-registration-link.com";
 
         function verifyFlag() {
-            const userInput = document.getElementById('flag-input').value.trim();
-            const errorMsg = document.getElementById('error-msg');
-            const loading = document.getElementById('loading');
+            const u = document.getElementById('flag-input').value.trim();
+            const e = document.getElementById('error-msg');
+            const l = document.getElementById('loading');
             
-            // Reset messages
-            errorMsg.innerText = "";
-            loading.style.display = "block";
+            e.innerText = "";
+            l.style.display = "block";
 
-            // Simulate a slight delay to make it feel like real server processing
             setTimeout(() => {
-                loading.style.display = "none";
+                l.style.display = "none";
 
-                if (userInput === CORRECT_FLAG) {
-                    showSuccessScreen();
-                } else if (userInput === "") {
-                    errorMsg.innerText = "[!] ERROR: Payload cannot be empty.";
-                } else {
-                    errorMsg.innerText = "[!] ACCESS DENIED: Invalid flag. Look closer at the original transmission source code. The network forgives, but it doesn't forget.";
+                if (u === "") {
+                    e.innerText = "[!] ERROR: Payload cannot be empty.";
+                    return;
                 }
-            }, 800); // 800ms delay for dramatic effect
+
+                if (u.length !== 21) {
+                    e.innerText = "[!] ACCESS DENIED: Invalid flag format.";
+                    return;
+                }
+
+                let v = true;
+                for (let i = 0; i < u.length; i++) {
+                    if ((u.charCodeAt(i) ^ 42) !== c[i]) {
+                        v = false;
+                        break;
+                    }
+                }
+
+                if (v) {
+                    showSuccessScreen();
+                } else {
+                    e.innerText = "[!] ACCESS DENIED: Invalid flag. Look closer at the original transmission source code. The network forgives, but it doesn't forget.";
+                }
+            }, 800);
         }
 
         function showSuccessScreen() {
             document.getElementById('input-screen').style.display = "none";
             document.getElementById('success-screen').style.display = "block";
 
-            const successMessage = "Congratulations. You found the backdoor.\n\nIf you enjoyed this, you are exactly who we are looking for. This is just a taste of what real CTF challenges look like—raw logic, hidden data, and critical thinking.\n\n> Rerouting secure connection to the Mainframe Registration in 5 seconds...";
+            const s = "Congratulations. You found the backdoor.\n\nIf you enjoyed this, you are exactly who we are looking for. This is just a taste of what real CTF challenges look like—raw logic, hidden data, and critical thinking.\n\n> Rerouting secure connection to the Mainframe Registration in 5 seconds...";
             
-            typeWriterEffect(successMessage, 0);
+            typeWriterEffect(s, 0);
 
-            // Redirect to the actual registration page after 5 seconds
             setTimeout(() => {
-                window.location.href = REGISTRATION_URL;
+                window.location.href = r;
             }, 5500);
         }
 
         function typeWriterEffect(text, i) {
             if (i < text.length) {
                 document.getElementById("typewriter-text").innerHTML += text.charAt(i);
-                setTimeout(() => typeWriterEffect(text, i + 1), 30); // Typing speed
+                setTimeout(() => typeWriterEffect(text, i + 1), 30);
             } else {
                 document.getElementById("typewriter-text").classList.add("typewriter");
             }
         }
 
-        // Allow pressing "Enter" to submit
-        document.getElementById('flag-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
+        document.getElementById('flag-input').addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
                 verifyFlag();
             }
         });
